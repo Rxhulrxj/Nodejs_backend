@@ -51,6 +51,31 @@ const verifyToken = (req, res, next) => {
   }
 };
 
+// middleware function to verify the JWT whether the user is Admin or not
+const AdminverifyToken = (req, res, next) => {
+  // get the token from the request header
+  const token = req.headers["authorization"].split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ message: "Access denied" });
+  }
+
+  try {
+    // verify the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log(decoded.isAdmin);
+    if (decoded.isAdmin == "true") {
+      req.user = decoded;
+      next();
+    } else {
+      res.status(400).json({ message: "User is not an Admin" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ message: "Invalid token" });
+  }
+};
+
 const port = 5000;
 
 module.exports = {
@@ -59,4 +84,5 @@ module.exports = {
   profile_upload,
   port,
   verifyToken,
+  AdminverifyToken,
 };

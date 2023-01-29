@@ -223,4 +223,5 @@ router.get("/delete-product/:id", AdminverifyToken, (req, res) => {
     );
   }
 });
+
 module.exports = router;

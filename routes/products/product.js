@@ -122,62 +122,62 @@ router.post(
   AdminverifyToken,
   (req, res) => {
     let productname = req.body.productname;
-    console.log(req.files.product_image);
-    productname == null || productname == undefined
-      ? null
-      : db.query(
-          "SELECT * FROM products WHERE product_name=?",
-          productname,
-          (err, result) => {
-            if (err) {
-              return res.status(400).json({ message: err.message });
-            }
-            if (result.length > 0) {
-              return res.status(400).json({ message: "Item Already Exists" });
-            } else {
-              db.query(
-                "Insert into products(product_name,product_image,product_image2,product_image3,product_description,product_price,thumbnail,rating,brand,category,user_id,date_modified) Values (?,?,?,?,?,?,?,?,?,?,?,?)",
-                [
-                  productname,
-                  req.files.product_image == undefined ||
-                  req.files.product_image == null
-                    ? null
-                    : "public/products/" + req.files.product_image[0].filename,
-
-                  req.files.product_image2 == undefined ||
-                  req.files.product_image2 == null
-                    ? null
-                    : "public/products/" + req.files.product_image2[0].filename,
-
-                  req.files.product_image3 == undefined ||
-                  req.files.product_image3 == null
-                    ? null
-                    : "public/products/" + req.files.product_image3[0].filename,
-                  req.body.product_description,
-                  req.body.product_price,
-                  req.files.thumbnail == undefined ||
-                  req.files.thumbnail == null
-                    ? null
-                    : "public/products/" + req.files.thumbnail[0].filename,
-                  req.body.rating,
-                  req.body.brand,
-                  req.body.category,
-                  req.user._id,
-                  moment().format("YYYY-MM-DD HH:mm:ss"),
-                ],
-                (er, resul) => {
-                  console.log(er);
-                  if (er) return res.status(400).json({ message: er.message });
-                  if (resul) {
-                    return res.json({
-                      message: "products Added successfully",
-                    });
-                  }
-                }
-              );
-            }
+    if (productname == null || productname == undefined) {
+      return res.status(400).json({ message: "Product name is Required" });
+    } else {
+      db.query(
+        "SELECT * FROM products WHERE product_name=?",
+        productname,
+        (err, result) => {
+          if (err) {
+            return res.status(400).json({ message: err.message });
           }
-        );
+          if (result.length > 0) {
+            return res.status(400).json({ message: "Item Already Exists" });
+          } else {
+            db.query(
+              "Insert into products(product_name,product_image,product_image2,product_image3,product_description,product_price,thumbnail,rating,brand,category,user_id,date_modified) Values (?,?,?,?,?,?,?,?,?,?,?,?)",
+              [
+                productname,
+                req.files.product_image == undefined ||
+                req.files.product_image == null
+                  ? null
+                  : "public/products/" + req.files.product_image[0].filename,
+
+                req.files.product_image2 == undefined ||
+                req.files.product_image2 == null
+                  ? null
+                  : "public/products/" + req.files.product_image2[0].filename,
+
+                req.files.product_image3 == undefined ||
+                req.files.product_image3 == null
+                  ? null
+                  : "public/products/" + req.files.product_image3[0].filename,
+                req.body.product_description,
+                req.body.product_price,
+                req.files.thumbnail == undefined || req.files.thumbnail == null
+                  ? null
+                  : "public/products/" + req.files.thumbnail[0].filename,
+                req.body.rating,
+                req.body.brand,
+                req.body.category,
+                req.user._id,
+                moment().format("YYYY-MM-DD HH:mm:ss"),
+              ],
+              (er, resul) => {
+                console.log(er);
+                if (er) return res.status(400).json({ message: er.message });
+                if (resul) {
+                  return res.json({
+                    message: "products Added successfully",
+                  });
+                }
+              }
+            );
+          }
+        }
+      );
+    }
   }
 );
 
@@ -192,4 +192,35 @@ router.get("/product-detail/:id", verifyToken, (req, res) => {
   });
 });
 
+router.get("/delete-product/:id", AdminverifyToken, (req, res) => {
+  let productId = req.params.id;
+  if (productId == null || productId == undefined) {
+    return res.status(400).json({
+      message: "Product Id is required",
+    });
+  } else {
+    db.query(
+      "Select * from products where id=?",
+      parseInt(productId),
+      (err, product) => {
+        if (err) return res.status(400).json({ message: err.message });
+        if (product) {
+          db.query(
+            "Delete  from products where id=?",
+            parseInt(productId),
+            (er, prod) => {
+              if (er) return res.status(400).json({ message: er.message });
+              if (prod.affectedRows == 1) {
+                res.json({
+                  success: true,
+                  message: "Product Deleted Successfully",
+                });
+              }
+            }
+          );
+        }
+      }
+    );
+  }
+});
 module.exports = router;

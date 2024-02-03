@@ -1,20 +1,24 @@
 var mysql = require("mysql2");
 const bcrypt = require("bcrypt");
-var con = mysql.createConnection({
-  host: "localhost", //host name
-  user: "root", // your mysql username default is root
-  password: "", // your mysql user password default for root is empty
-  dateStrings: true, // used to display date in proper formats
-});
+// var con = mysql.createConnection({
+//   host: "localhost", //host name
+//   user: "root", // your mysql username default is root
+//   password: "", // your mysql user password default for root is empty
+//   dateStrings: true, // used to display date in proper formats
+// });
+
+var con = mysql.createPool({
+  
+})
 
 con.connect(function (err) {
   if (err) throw err;
   console.log("Connected!");
   con.query(
-    "CREATE DATABASE IF NOT EXISTS flutterbackend ",
+    "CREATE DATABASE IF NOT EXISTS nodejsbackend ",
     async function (err, result) {
       if (err) throw err;
-      con.query("use flutterbackend");
+      con.query("use nodejsbackend");
       con.query(
         "Create TABLE if not exists users(id int primary key auto_increment,fullname varchar(200),emailaddress varchar(200)NOT null UNIQUE,Username varchar(200) Not null UNIQUE,password varchar(200),Date_created datetime default current_timestamp(),isAdmin ENUM('false', 'true') NOT NULL DEFAULT 'false',profile_photo text,gender ENUM('Male', 'Female','Others'),date_modified datetime default current_timestamp())"
       );

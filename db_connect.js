@@ -8,17 +8,25 @@ const bcrypt = require("bcrypt");
 // });
 
 var con = mysql.createPool({
-  
+  database:process.env.DB_Database,
+  host:process.env.DB_HOST,
+  user:process.env.DB_ROOT,
+  password:process.env.DB_PASSWORD,
+  port:process.env.DB_PORT,
+  waitForConnections:true,
+  connectionLimit:10,
+  dateStrings:true,
+
 })
 
-con.connect(function (err) {
+con.getConnection(async function (err,conn) {
   if (err) throw err;
   console.log("Connected!");
-  con.query(
-    "CREATE DATABASE IF NOT EXISTS nodejsbackend ",
-    async function (err, result) {
-      if (err) throw err;
-      con.query("use nodejsbackend");
+  // con.query(
+    // "CREATE DATABASE IF NOT EXISTS nodejsbackend ",
+    // async function (err, result) {
+      // if (err) throw err;
+      // con.query("use nodejsbackend");
       con.query(
         "Create TABLE if not exists users(id int primary key auto_increment,fullname varchar(200),emailaddress varchar(200)NOT null UNIQUE,Username varchar(200) Not null UNIQUE,password varchar(200),Date_created datetime default current_timestamp(),isAdmin ENUM('false', 'true') NOT NULL DEFAULT 'false',profile_photo text,gender ENUM('Male', 'Female','Others'),date_modified datetime default current_timestamp())"
       );
@@ -35,8 +43,8 @@ con.connect(function (err) {
       con.query(
         "Create TABLE if not exists products(id int primary key auto_increment,product_name varchar(200) Unique,product_image text,product_image2 text,product_image3 text,product_description text,product_price float,Date_Added date default current_timestamp(),date_modified date default current_timestamp(),thumbnail text,rating float,brand varchar(200),category varchar(200),user_id int,FOREIGN KEY(user_id) References users(id))"
       );
-    }
-  );
+    // }
+  // );
 });
 
 module.exports = con;
